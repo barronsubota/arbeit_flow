@@ -1147,9 +1147,274 @@ h1 span {
   clip-path: inset(50%);
 }
 
+.contacts-hero,
+.contacts-content {
+  width: min(100% - 3rem, 1180px);
+  margin: 0 auto;
+}
+
+.contacts-hero {
+  position: relative;
+  padding: 4.5rem 0 3rem;
+}
+
+.contacts-glow {
+  position: absolute;
+  top: 0;
+  right: 12%;
+  width: 380px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary-strong) 17%, transparent), transparent 68%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.contacts-hero .eyebrow,
+.contacts-hero h1,
+.contacts-hero > p:last-child {
+  position: relative;
+}
+
+.contacts-hero h1 {
+  max-width: 800px;
+  margin-bottom: 0.9rem;
+  font-size: clamp(2.7rem, 5vw, 4.25rem);
+}
+
+.contacts-hero h1 span {
+  color: var(--primary);
+}
+
+.contacts-hero > p:last-child {
+  max-width: 650px;
+  margin-bottom: 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.contacts-content {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: start;
+  gap: clamp(2rem, 6vw, 5rem);
+  padding-bottom: 5rem;
+}
+
+.contacts-info {
+  padding-top: 1rem;
+}
+
+.contacts-info h2,
+.contact-form-heading h2 {
+  margin-bottom: 0.8rem;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  letter-spacing: -0.05em;
+  line-height: 1.2;
+}
+
+.contacts-intro {
+  margin-bottom: 1.7rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.contact-topics {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.contact-topic-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 0.95rem;
+  background: var(--surface-raised);
+}
+
+.contact-topic-icon,
+.form-heading-mark {
+  display: grid;
+  width: 2.7rem;
+  height: 2.7rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 0.8rem;
+  color: var(--primary);
+  background: var(--surface-card);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.contact-topic-card h3 {
+  margin: 0.1rem 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.contact-topic-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.contact-jobs-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1.35rem;
+  color: var(--primary);
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+
+.contact-form-panel {
+  padding: clamp(1.3rem, 3vw, 2rem);
+  border-radius: 1.25rem;
+  background: var(--surface-raised);
+}
+
+.contact-form-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-heading-mark {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.4rem;
+}
+
+.contact-form-heading h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.3rem;
+}
+
+.contact-form-heading p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.contact-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.contact-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.form-field {
+  display: grid;
+  min-width: 0;
+  gap: 0.45rem;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.form-field > span > span {
+  color: var(--primary);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--text-muted) 20%, transparent);
+  border-radius: 0.7rem;
+  color: var(--text);
+  background: var(--surface-card);
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.form-field textarea {
+  min-height: 8rem;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.form-field select:invalid {
+  color: var(--text-muted);
+}
+
+.form-field option {
+  color: var(--text);
+  background: var(--surface-card);
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: var(--primary);
+  outline: 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.consent-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.consent-field input {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin: 0.1rem 0 0;
+  accent-color: var(--primary-strong);
+}
+
+.form-demo-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.contact-submit {
+  justify-self: start;
+  min-height: 2.9rem;
+  cursor: pointer;
+}
+
+.form-status {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 0.75rem;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface-card));
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
 @media (max-width: 900px) {
   .hero-section {
     min-height: 510px;
+  }
+
+  .contacts-content {
+    gap: 2rem;
   }
 
   .vacancy-card-footer {
@@ -1217,8 +1482,24 @@ h1 span {
   .contact-banner,
   .vacancies-hero,
   .vacancy-search-section,
-  .vacancy-results {
+  .vacancy-results,
+  .contacts-hero,
+  .contacts-content {
     width: min(100% - 2rem, 1180px);
+  }
+
+  .contacts-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-bottom: 3rem;
+  }
+
+  .contacts-hero {
+    padding: 3.5rem 0 2rem;
+  }
+
+  .contacts-info {
+    padding-top: 0;
   }
 
   .vacancies-hero {
@@ -1414,7 +1695,9 @@ h1 span {
   .contact-banner,
   .vacancies-hero,
   .vacancy-search-section,
-  .vacancy-results {
+  .vacancy-results,
+  .contacts-hero,
+  .contacts-content {
     width: min(100% - 1.5rem, 1180px);
   }
 
@@ -1488,6 +1771,22 @@ h1 span {
 
   .vacancy-posted {
     margin-left: 0;
+  }
+
+  .contacts-hero {
+    padding-top: 3rem;
+  }
+
+  .contact-form-panel {
+    padding: 1.1rem;
+  }
+
+  .contact-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-submit {
+    width: 100%;
   }
 }
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ContactsPage from "./ContactsPage";
 import VacanciesPage from "./VacanciesPage";
 
 const partners = [
@@ -70,14 +71,18 @@ const testimonials = [
 function App() {
   const [isDark, setIsDark] = useState(true);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const isVacanciesPage = window.location.pathname.replace(/\/+$/, "") === "/vacancies";
+  const currentPath = window.location.pathname.replace(/\/+$/, "");
+  const isVacanciesPage = currentPath === "/vacancies";
+  const isContactsPage = currentPath === "/contacts";
   const testimonial = testimonials[activeTestimonial];
 
   useEffect(() => {
     document.title = isVacanciesPage
       ? "Вакансії для junior IT-фахівців — ArbeitFlow"
-      : "ArbeitFlow — робота для junior IT-фахівців";
-  }, [isVacanciesPage]);
+      : isContactsPage
+        ? "Контакти — ArbeitFlow"
+        : "ArbeitFlow — робота для junior IT-фахівців";
+  }, [isContactsPage, isVacanciesPage]);
 
   function showTestimonial(direction: number) {
     setActiveTestimonial(
@@ -101,13 +106,15 @@ function App() {
           </a>
 
           <nav aria-label="Головна навігація" className="main-nav">
-            <a aria-current={!isVacanciesPage ? "page" : undefined} className={!isVacanciesPage ? "active" : undefined} href="/">
+            <a aria-current={!isVacanciesPage && !isContactsPage ? "page" : undefined} className={!isVacanciesPage && !isContactsPage ? "active" : undefined} href="/">
               Головна
             </a>
             <a aria-current={isVacanciesPage ? "page" : undefined} className={isVacanciesPage ? "active" : undefined} href="/vacancies">
               Вакансії
             </a>
-            <a href="/#contact">Контакти</a>
+            <a aria-current={isContactsPage ? "page" : undefined} className={isContactsPage ? "active" : undefined} href="/contacts">
+              Контакти
+            </a>
           </nav>
 
           <div className="header-actions">
@@ -126,7 +133,7 @@ function App() {
         </div>
       </header>
 
-      {isVacanciesPage ? <VacanciesPage /> : <main id="main-content">
+      {isVacanciesPage ? <VacanciesPage /> : isContactsPage ? <ContactsPage /> : <main id="main-content">
         <section aria-labelledby="hero-title" className="hero-section" id="home">
           <div aria-hidden="true" className="hero-glow" />
           <div className="hero-content">
