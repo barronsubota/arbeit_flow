@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from "react";
+import { getRouteHref } from "../lib/routes";
 
 const contactTopics = [
   "Пошук вакансій",
@@ -58,7 +59,7 @@ function ContactsPage() {
             </article>
           </div>
 
-          <a className="contact-jobs-link" href="/vacancies">
+          <a className="contact-jobs-link" href={getRouteHref("/vacancies")}>
             Переглянути відкриті вакансії <span aria-hidden="true">→</span>
           </a>
         </div>

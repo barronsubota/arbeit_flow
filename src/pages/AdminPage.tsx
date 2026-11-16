@@ -8,6 +8,7 @@ import {
   type Vacancy,
   type VacancyInput,
 } from "../lib/api";
+import { getRouteHref } from "../lib/routes";
 
 type AdminPageProps = {
   user: AuthUser | null;
@@ -140,7 +141,7 @@ function AdminPage({ user, authLoading }: AdminPageProps) {
           <p className="eyebrow">Панель керування</p>
           <h1>Потрібен вхід</h1>
           <p className="auth-intro">Увійди до акаунта адміністратора, щоб керувати вакансіями.</p>
-          <a className="button" href="/login">Перейти до входу <span aria-hidden="true">→</span></a>
+          <a className="button" href={getRouteHref("/login")}>Перейти до входу <span aria-hidden="true">→</span></a>
         </section>
       </main>
     );
@@ -153,7 +154,7 @@ function AdminPage({ user, authLoading }: AdminPageProps) {
           <p className="eyebrow">Панель керування</p>
           <h1>Немає доступу</h1>
           <p className="auth-intro">Створювати й редагувати вакансії може лише адміністратор.</p>
-          <a className="button" href="/vacancies">До вакансій <span aria-hidden="true">→</span></a>
+          <a className="button" href={getRouteHref("/vacancies")}>До вакансій <span aria-hidden="true">→</span></a>
         </section>
       </main>
     );

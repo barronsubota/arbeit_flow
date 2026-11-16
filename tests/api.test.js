@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -32,18 +32,6 @@ function reservePort() {
       });
     });
   });
-}
-
-function readCredentials() {
-  return Object.fromEntries(
-    readFileSync(join(temporaryDirectory, "credentials.local.txt"), "utf8")
-      .split(/\r?\n/)
-      .filter((line) => line.includes("="))
-      .map((line) => {
-        const separator = line.indexOf("=");
-        return [line.slice(0, separator), line.slice(separator + 1)];
-      }),
-  );
 }
 
 function waitForServer() {
@@ -83,19 +71,22 @@ function waitForServer() {
   });
 }
 
-async function request(path, { body, cookie, method = "GET" } = {}) {
-  const headers = {};
+async function request(path, { body, cookie, headers = {}, method = "GET", origin } = {}) {
+  const requestHeaders = { ...headers };
 
   if (body !== undefined) {
-    headers["content-type"] = "application/json";
+    requestHeaders["content-type"] = "application/json";
   }
   if (cookie) {
-    headers.cookie = cookie;
+    requestHeaders.cookie = cookie;
+  }
+  if (origin) {
+    requestHeaders.origin = origin;
   }
 
   const response = await fetch(`${baseUrl}${path}`, {
     method,
-    headers,
+    headers: requestHeaders,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const text = await response.text();
@@ -119,6 +110,7 @@ async function login(email, password) {
 
   return {
     cookie: setCookie.split(";", 1)[0],
+    setCookie,
     user: json.user,
   };
 }
@@ -129,6 +121,14 @@ before(async () => {
   const env = {
     ...process.env,
     DB_PATH: join(temporaryDirectory, ".data", "arbeitflow.sqlite"),
+    CORS_ORIGIN: "https://arbeitflow.example",
+    COOKIE_SAME_SITE: "none",
+    HOST: "127.0.0.1",
+    NODE_ENV: "production",
+    ADMIN_EMAIL: "admin@example.test",
+    ADMIN_PASSWORD: "test-admin-password",
+    USER_EMAIL: "user@example.test",
+    USER_PASSWORD: "test-user-password",
     PORT: String(port),
   };
 
@@ -138,15 +138,15 @@ before(async () => {
     stdio: "ignore",
   });
 
-  const credentials = readCredentials();
   adminCredentials = {
-    email: credentials.ADMIN_EMAIL,
-    password: credentials.ADMIN_PASSWORD,
+    email: env.ADMIN_EMAIL,
+    password: env.ADMIN_PASSWORD,
   };
   userCredentials = {
-    email: credentials.USER_EMAIL,
-    password: credentials.USER_PASSWORD,
+    email: env.USER_EMAIL,
+    password: env.USER_PASSWORD,
   };
+  assert.equal(existsSync(join(temporaryDirectory, "credentials.local.txt")), false);
   baseUrl = `http://127.0.0.1:${port}`;
   serverProcess = spawn(process.execPath, [join(projectDirectory, "server", "index.js")], {
     cwd: temporaryDirectory,
@@ -180,6 +180,18 @@ test("public vacancy browsing and protected favorites", async () => {
   assert.equal(vacanciesResponse.status, 200);
   assert.equal(vacancies.vacancies.length, 6);
 
+  const { response: corsResponse } = await request("/api/vacancies", {
+    origin: "https://arbeitflow.example",
+  });
+  assert.equal(corsResponse.headers.get("access-control-allow-origin"), "https://arbeitflow.example");
+
+  const { response: preflightResponse } = await request("/api/favorites/1", {
+    method: "OPTIONS",
+    origin: "https://arbeitflow.example",
+    headers: { "access-control-request-method": "POST" },
+  });
+  assert.equal(preflightResponse.status, 204);
+
   const { json: guestSession } = await request("/api/auth/me");
   assert.equal(guestSession.user, null);
 
@@ -199,6 +211,16 @@ test("login roles and account-scoped favorite management", async () => {
 
   const user = await login(userCredentials.email, userCredentials.password);
   assert.equal(user.user.role, "user");
+  assert.match(user.cookie, /arbeitflow_session=/);
+  assert.match(user.setCookie, /Secure/);
+  assert.match(user.setCookie, /SameSite=None/);
+
+  const { response: deniedOrigin } = await request("/api/favorites/1", {
+    method: "POST",
+    cookie: user.cookie,
+    origin: "https://attacker.example",
+  });
+  assert.equal(deniedOrigin.status, 403);
 
   const { response: deniedCreate } = await request("/api/vacancies", {
     method: "POST",

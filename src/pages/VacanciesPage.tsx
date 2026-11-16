@@ -7,6 +7,7 @@ import {
   type AuthUser,
   type Vacancy,
 } from "../lib/api";
+import { getRouteHref } from "../lib/routes";
 
 type VacanciesPageProps = {
   user: AuthUser | null;
@@ -217,7 +218,7 @@ function VacanciesPage({ user }: VacanciesPageProps) {
 
         {error && (
           <p className="api-error" role="alert">
-            {error} {!user && <a href="/login">Увійти</a>}
+            {error} {!user && <a href={getRouteHref("/login")}>Увійти</a>}
           </p>
         )}
 
@@ -295,7 +296,7 @@ function VacanciesPage({ user }: VacanciesPageProps) {
                 <h3>{showSavedOnly ? "Збережених вакансій поки немає" : "Вакансій не знайдено"}</h3>
                 <p>Спробуй змінити запит або скинути фільтри.</p>
                 {showSavedOnly && !user ? (
-                  <a className="button" href="/login">Увійти до акаунта</a>
+                  <a className="button" href={getRouteHref("/login")}>Увійти до акаунта</a>
                 ) : (
                   <button className="button" onClick={resetFilters} type="button">
                     Скинути фільтри

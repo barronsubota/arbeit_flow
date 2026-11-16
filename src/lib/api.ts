@@ -23,6 +23,8 @@ export type Vacancy = {
 
 export type VacancyInput = Omit<Vacancy, "id" | "createdAt" | "updatedAt">;
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "") || "";
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
 
@@ -30,11 +32,16 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(`/api${path}`, {
+  const response = await fetch(`${apiBaseUrl}/api${path}`, {
     ...init,
-    credentials: "same-origin",
+    credentials: apiBaseUrl ? "include" : "same-origin",
     headers,
   });
+
+  if (!response.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("Сервер повернув неочікувану відповідь. Перевірте налаштування API.");
+  }
+
   const result: unknown = await response.json();
 
   if (!response.ok) {

@@ -18,8 +18,24 @@ if (!existsSync(envPath)) {
 config({ path: envPath });
 
 const credentialsPath = resolve("credentials.local.txt");
+const requiredCredentialKeys = [
+  "ADMIN_EMAIL",
+  "ADMIN_PASSWORD",
+  "USER_EMAIL",
+  "USER_PASSWORD",
+];
+const providedCredentials = Object.fromEntries(
+  requiredCredentialKeys
+    .filter((key) => process.env[key])
+    .map((key) => [key, process.env[key]]),
+);
+const providedCredentialCount = Object.keys(providedCredentials).length;
 
-if (!existsSync(credentialsPath)) {
+if (providedCredentialCount > 0 && providedCredentialCount !== requiredCredentialKeys.length) {
+  throw new Error(`Set all of these environment variables: ${requiredCredentialKeys.join(", ")}.`);
+}
+
+if (Object.keys(providedCredentials).length === 0 && !existsSync(credentialsPath)) {
   const credentials = [
     "ADMIN_EMAIL=admin@example.com",
     `ADMIN_PASSWORD=${randomBytes(24).toString("base64url")}`,
@@ -30,22 +46,17 @@ if (!existsSync(credentialsPath)) {
   writeFileSync(credentialsPath, credentials, { flag: "wx", mode: 0o600 });
 }
 
-const credentials = Object.fromEntries(
-  readFileSync(credentialsPath, "utf8")
-    .split(/\r?\n/)
-    .filter((line) => line.includes("="))
-    .map((line) => {
-      const separator = line.indexOf("=");
-      return [line.slice(0, separator), line.slice(separator + 1)];
-    }),
-);
-
-const requiredCredentialKeys = [
-  "ADMIN_EMAIL",
-  "ADMIN_PASSWORD",
-  "USER_EMAIL",
-  "USER_PASSWORD",
-];
+const credentials = providedCredentialCount
+  ? providedCredentials
+  : Object.fromEntries(
+      readFileSync(credentialsPath, "utf8")
+        .split(/\r?\n/)
+        .filter((line) => line.includes("="))
+        .map((line) => {
+          const separator = line.indexOf("=");
+          return [line.slice(0, separator), line.slice(separator + 1)];
+        }),
+    );
 
 if (requiredCredentialKeys.some((key) => !credentials[key])) {
   throw new Error(`The credentials file must define: ${requiredCredentialKeys.join(", ")}.`);
@@ -68,4 +79,8 @@ for (const account of [
 }
 
 db.close();
-console.log("Local demo accounts are ready. Credentials are in credentials.local.txt.");
+console.log(
+  providedCredentialCount
+    ? "Configured deployment accounts are ready."
+    : "Local demo accounts are ready. Credentials are in credentials.local.txt.",
+);

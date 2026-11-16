@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { login, type AuthUser } from "../lib/api";
+import { getRouteHref } from "../lib/routes";
 
 type LoginPageProps = {
   onLogin: (user: AuthUser) => void;
@@ -68,7 +69,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
         </form>
 
         <p className="auth-footnote">
-          Демо-акаунти створюються локально. <a href="/contacts">Потрібна допомога?</a>
+          Демо-акаунти створюються локально. <a href={getRouteHref("/contacts")}>Потрібна допомога?</a>
         </p>
       </section>
     </main>

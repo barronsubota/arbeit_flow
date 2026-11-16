@@ -4,6 +4,7 @@ import ContactsPage from "./pages/ContactsPage";
 import LoginPage from "./pages/LoginPage";
 import VacanciesPage from "./pages/VacanciesPage";
 import { getCurrentUser, logout, type AuthUser } from "./lib/api";
+import { getCurrentRoute, getRouteHref } from "./lib/routes";
 
 const partners = [
   {
@@ -77,7 +78,7 @@ function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState("");
-  const currentPath = window.location.pathname.replace(/\/+$/, "");
+  const currentPath = getCurrentRoute();
   const isVacanciesPage = currentPath === "/vacancies";
   const isContactsPage = currentPath === "/contacts";
   const isLoginPage = currentPath === "/login";
@@ -108,7 +109,7 @@ function App() {
 
   function handleLogin(nextUser: AuthUser) {
     setUser(nextUser);
-    window.location.assign(nextUser.role === "admin" ? "/admin" : "/vacancies");
+    window.location.assign(getRouteHref(nextUser.role === "admin" ? "/admin" : "/vacancies"));
   }
 
   async function handleLogout() {
@@ -117,7 +118,7 @@ function App() {
     try {
       await logout();
       setUser(null);
-      window.location.assign("/");
+      window.location.assign(getRouteHref("/"));
     } catch (reason) {
       setAuthError(reason instanceof Error ? reason.message : "Не вдалося вийти з акаунта.");
     }
@@ -137,7 +138,7 @@ function App() {
 
       <header className="site-header">
         <div className="header-inner">
-          <a aria-label="ArbeitFlow — на головну" className="brand" href="/">
+          <a aria-label="ArbeitFlow — на головну" className="brand" href={getRouteHref("/")}>
             <span aria-hidden="true" className="brand-mark">
               A
             </span>
@@ -145,13 +146,13 @@ function App() {
           </a>
 
           <nav aria-label="Головна навігація" className="main-nav">
-            <a aria-current={isHomePage ? "page" : undefined} className={isHomePage ? "active" : undefined} href="/">
+            <a aria-current={isHomePage ? "page" : undefined} className={isHomePage ? "active" : undefined} href={getRouteHref("/")}>
               Головна
             </a>
-            <a aria-current={isVacanciesPage ? "page" : undefined} className={isVacanciesPage ? "active" : undefined} href="/vacancies">
+            <a aria-current={isVacanciesPage ? "page" : undefined} className={isVacanciesPage ? "active" : undefined} href={getRouteHref("/vacancies")}>
               Вакансії
             </a>
-            <a aria-current={isContactsPage ? "page" : undefined} className={isContactsPage ? "active" : undefined} href="/contacts">
+            <a aria-current={isContactsPage ? "page" : undefined} className={isContactsPage ? "active" : undefined} href={getRouteHref("/contacts")}>
               Контакти
             </a>
           </nav>
@@ -171,12 +172,12 @@ function App() {
               </span>
             )}
             {user?.role === "admin" && (
-              <a className="button button-small admin-panel-link" href="/admin">
+              <a className="button button-small admin-panel-link" href={getRouteHref("/admin")}>
                 Панель
               </a>
             )}
             {user?.role !== "admin" && (
-              <a className="button button-small find-vacancy-button" href="/vacancies">
+              <a className="button button-small find-vacancy-button" href={getRouteHref("/vacancies")}>
                 Знайти вакансію
               </a>
             )}
@@ -190,7 +191,7 @@ function App() {
                 <span aria-hidden="true">↗</span>
               </button>
             ) : (
-              <a className="button button-small login-link" href="/login">
+              <a className="button button-small login-link" href={getRouteHref("/login")}>
                 Увійти
               </a>
             )}
@@ -223,7 +224,7 @@ function App() {
               Вакансії для junior IT-фахівців, чесні вимоги та команди, готові
               допомагати зростати.
             </p>
-            <a className="button hero-button" href="/vacancies">
+            <a className="button hero-button" href={getRouteHref("/vacancies")}>
               Переглянути вакансії <span aria-hidden="true">→</span>
             </a>
             <p className="hero-note">Твій досвід — це більше, ніж рядок у резюме.</p>
@@ -257,7 +258,7 @@ function App() {
                 </span>
                 <h3>{partner.name}</h3>
                 <p>{partner.description}</p>
-                <a className="text-link" href="/vacancies">
+                <a className="text-link" href={getRouteHref("/vacancies")}>
                   Переглянути вакансії <span aria-hidden="true">→</span>
                 </a>
               </article>
@@ -346,14 +347,14 @@ function App() {
             <p className="eyebrow">Наступний крок за тобою</p>
             <h2 id="contact-title">Готовий знайти свою першу IT-команду?</h2>
           </div>
-          <a className="button" href="/vacancies">
+          <a className="button" href={getRouteHref("/vacancies")}>
             Переглянути команди <span aria-hidden="true">→</span>
           </a>
         </section>
       </main>}
 
       <footer className="site-footer">
-        <a aria-label="ArbeitFlow — на головну" className="brand" href="/">
+        <a aria-label="ArbeitFlow — на головну" className="brand" href={getRouteHref("/")}>
           <span aria-hidden="true" className="brand-mark">
             A
           </span>
