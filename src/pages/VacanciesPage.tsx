@@ -1,62 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  getFavoriteVacancyIds,
-  getVacancies,
-  removeFavoriteVacancy,
-  saveFavoriteVacancy,
-  type AuthUser,
-  type Vacancy,
-} from "../lib/api";
-import { getRouteHref } from "../lib/routes";
+import { vacancies } from "../data/vacancies";
+import { getSavedVacancyIds, setSavedVacancyIds } from "../lib/favorites";
 
-type VacanciesPageProps = {
-  user: AuthUser | null;
-};
-
-function VacanciesPage({ user }: VacanciesPageProps) {
-  const [vacancies, setVacancies] = useState<Vacancy[]>([]);
+function VacanciesPage() {
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
   const [selectedStack, setSelectedStack] = useState("");
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [savedIds, setSavedIds] = useState<number[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let active = true;
-    setIsLoading(true);
-    setError("");
-
-    Promise.all([
-      getVacancies(),
-      user ? getFavoriteVacancyIds() : Promise.resolve([]),
-    ])
-      .then(([nextVacancies, nextSavedIds]) => {
-        if (active) {
-          setVacancies(nextVacancies);
-          setSavedIds(nextSavedIds);
-        }
-      })
-      .catch((reason: unknown) => {
-        if (active) {
-          setError(reason instanceof Error ? reason.message : "Не вдалося завантажити вакансії.");
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [user?.id]);
+    try {
+      setSavedIds(getSavedVacancyIds());
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Не вдалося прочитати обране.");
+    }
+  }, []);
 
   const stacks = useMemo(
     () => Array.from(new Set(vacancies.flatMap((vacancy) => vacancy.stack))),
-    [vacancies],
+    [],
   );
 
   const filteredVacancies = useMemo(() => {
@@ -81,24 +45,17 @@ function VacanciesPage({ user }: VacanciesPageProps) {
 
       return matchesQuery && matchesLocation && matchesStack && matchesSaved;
     });
-  }, [location, query, savedIds, selectedStack, showSavedOnly, vacancies]);
+  }, [location, query, savedIds, selectedStack, showSavedOnly]);
 
-  async function toggleSaved(vacancyId: number) {
-    if (!user) {
-      setError("Увійдіть до акаунта, щоб зберігати вакансії.");
-      return;
-    }
-
+  function toggleSaved(vacancyId: number) {
     const isSaved = savedIds.includes(vacancyId);
+    const nextSavedIds = isSaved
+      ? savedIds.filter((id) => id !== vacancyId)
+      : [...savedIds, vacancyId];
 
     try {
-      if (isSaved) {
-        await removeFavoriteVacancy(vacancyId);
-        setSavedIds((current) => current.filter((id) => id !== vacancyId));
-      } else {
-        await saveFavoriteVacancy(vacancyId);
-        setSavedIds((current) => [...current, vacancyId]);
-      }
+      setSavedVacancyIds(nextSavedIds);
+      setSavedIds(nextSavedIds);
       setError("");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Не вдалося оновити обране.");
@@ -106,11 +63,6 @@ function VacanciesPage({ user }: VacanciesPageProps) {
   }
 
   function toggleSavedFilter() {
-    if (!user) {
-      setError("Увійдіть до акаунта, щоб переглядати збережені вакансії.");
-      return;
-    }
-
     setShowSavedOnly((current) => !current);
   }
 
@@ -193,6 +145,7 @@ function VacanciesPage({ user }: VacanciesPageProps) {
             Збережені <span className="saved-count">{savedIds.length}</span>
           </button>
         </div>
+        <p className="saved-storage-note">Збережене доступне лише в цьому браузері.</p>
 
         <div aria-label="Фільтр за технологіями" className="stack-filters">
           <button
@@ -217,95 +170,87 @@ function VacanciesPage({ user }: VacanciesPageProps) {
         </div>
 
         {error && (
-          <p className="api-error" role="alert">
-            {error} {!user && <a href={getRouteHref("/login")}>Увійти</a>}
+          <p className="favorites-error" role="alert">
+            {error}
           </p>
         )}
 
-        {isLoading ? (
-          <p className="results-count">Завантажуємо вакансії...</p>
-        ) : (
-          <>
-            <p aria-live="polite" className="results-count">
-              Знайдено вакансій: <strong>{filteredVacancies.length}</strong>
-            </p>
+        <>
+          <p aria-live="polite" className="results-count">
+            Знайдено вакансій: <strong>{filteredVacancies.length}</strong>
+          </p>
 
-            {filteredVacancies.length ? (
-              <div className="vacancy-list">
-                {filteredVacancies.map((vacancy) => {
-                  const isSaved = savedIds.includes(vacancy.id);
-                  const posted = new Date(vacancy.createdAt).toLocaleDateString("uk-UA", {
-                    day: "numeric",
-                    month: "long",
-                  });
+          {filteredVacancies.length ? (
+            <div className="vacancy-list">
+              {filteredVacancies.map((vacancy) => {
+                const isSaved = savedIds.includes(vacancy.id);
+                const posted = new Date(vacancy.createdAt).toLocaleDateString("uk-UA", {
+                  day: "numeric",
+                  month: "long",
+                });
 
-                  return (
-                    <article className="vacancy-card" key={vacancy.id}>
-                      <div className="vacancy-card-main">
-                        <span aria-hidden="true" className="vacancy-company-mark">
-                          {vacancy.initials}
-                        </span>
-                        <div className="vacancy-summary">
-                          <p className="vacancy-company">{vacancy.company}</p>
-                          <h3>{vacancy.title}</h3>
-                          <p className="vacancy-description">{vacancy.description}</p>
-                          <div aria-label="Технології" className="vacancy-stack">
-                            {vacancy.stack.map((stack) => (
-                              <span className="vacancy-tag" key={stack}>
-                                {stack}
-                              </span>
+                return (
+                  <article className="vacancy-card" key={vacancy.id}>
+                    <div className="vacancy-card-main">
+                      <span aria-hidden="true" className="vacancy-company-mark">
+                        {vacancy.initials}
+                      </span>
+                      <div className="vacancy-summary">
+                        <p className="vacancy-company">{vacancy.company}</p>
+                        <h3>{vacancy.title}</h3>
+                        <p className="vacancy-description">{vacancy.description}</p>
+                        <div aria-label="Технології" className="vacancy-stack">
+                          {vacancy.stack.map((stack) => (
+                            <span className="vacancy-tag" key={stack}>
+                              {stack}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <button
+                        aria-label={isSaved ? `Видалити ${vacancy.title} з обраного` : `Зберегти ${vacancy.title}`}
+                        aria-pressed={isSaved}
+                        className={isSaved ? "favorite-button selected" : "favorite-button"}
+                        onClick={() => toggleSaved(vacancy.id)}
+                        type="button"
+                      >
+                        <span aria-hidden="true">{isSaved ? "♥" : "♡"}</span>
+                      </button>
+                    </div>
+                    <div className="vacancy-card-footer">
+                      <div className="vacancy-meta">
+                        <span><span aria-hidden="true">⌖</span> {vacancy.location}</span>
+                        <span><span aria-hidden="true">◷</span> {vacancy.schedule}</span>
+                        <span><span aria-hidden="true">₴</span> {vacancy.salary}</span>
+                      </div>
+                      <details className="vacancy-details">
+                        <summary>Деталі вакансії <span aria-hidden="true">↓</span></summary>
+                        <div className="vacancy-requirements">
+                          <h4>Що важливо</h4>
+                          <ul>
+                            {vacancy.requirements.map((requirement) => (
+                              <li key={requirement}>{requirement}</li>
                             ))}
-                          </div>
+                          </ul>
                         </div>
-                        <button
-                          aria-label={isSaved ? `Видалити ${vacancy.title} з обраного` : `Зберегти ${vacancy.title}`}
-                          aria-pressed={isSaved}
-                          className={isSaved ? "favorite-button selected" : "favorite-button"}
-                          onClick={() => void toggleSaved(vacancy.id)}
-                          type="button"
-                        >
-                          <span aria-hidden="true">{isSaved ? "♥" : "♡"}</span>
-                        </button>
-                      </div>
-                      <div className="vacancy-card-footer">
-                        <div className="vacancy-meta">
-                          <span><span aria-hidden="true">⌖</span> {vacancy.location}</span>
-                          <span><span aria-hidden="true">◷</span> {vacancy.schedule}</span>
-                          <span><span aria-hidden="true">₴</span> {vacancy.salary}</span>
-                        </div>
-                        <details className="vacancy-details">
-                          <summary>Деталі вакансії <span aria-hidden="true">↓</span></summary>
-                          <div className="vacancy-requirements">
-                            <h4>Що важливо</h4>
-                            <ul>
-                              {vacancy.requirements.map((requirement) => (
-                                <li key={requirement}>{requirement}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </details>
-                      </div>
-                      <span className="vacancy-posted">{posted}</span>
-                    </article>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="empty-results">
-                <span aria-hidden="true">⌕</span>
-                <h3>{showSavedOnly ? "Збережених вакансій поки немає" : "Вакансій не знайдено"}</h3>
-                <p>Спробуй змінити запит або скинути фільтри.</p>
-                {showSavedOnly && !user ? (
-                  <a className="button" href={getRouteHref("/login")}>Увійти до акаунта</a>
-                ) : (
-                  <button className="button" onClick={resetFilters} type="button">
-                    Скинути фільтри
-                  </button>
-                )}
-              </div>
-            )}
-          </>
-        )}
+                      </details>
+                    </div>
+                    <span className="vacancy-posted">{posted}</span>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="empty-results">
+              <span aria-hidden="true">⌕</span>
+              <h3>{showSavedOnly ? "Збережених вакансій поки немає" : "Вакансій не знайдено"}</h3>
+              <p>Спробуй змінити запит або скинути фільтри.</p>
+              <button className="button" onClick={resetFilters} type="button">
+                Скинути фільтри
+              </button>
+            </div>
+          )}
+        </>
       </section>
     </main>
   );

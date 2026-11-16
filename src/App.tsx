@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-import AdminPage from "./pages/AdminPage";
 import ContactsPage from "./pages/ContactsPage";
-import LoginPage from "./pages/LoginPage";
 import VacanciesPage from "./pages/VacanciesPage";
-import { getCurrentUser, logout, type AuthUser } from "./lib/api";
 import { getCurrentRoute, getRouteHref } from "./lib/routes";
 
 const partners = [
@@ -75,54 +72,19 @@ const testimonials = [
 function App() {
   const [isDark, setIsDark] = useState(true);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [authError, setAuthError] = useState("");
   const currentPath = getCurrentRoute();
   const isVacanciesPage = currentPath === "/vacancies";
   const isContactsPage = currentPath === "/contacts";
-  const isLoginPage = currentPath === "/login";
-  const isAdminPage = currentPath === "/admin";
-  const isHomePage = !isVacanciesPage && !isContactsPage && !isLoginPage && !isAdminPage;
+  const isHomePage = !isVacanciesPage && !isContactsPage;
   const testimonial = testimonials[activeTestimonial];
-
-  useEffect(() => {
-    getCurrentUser()
-      .then(setUser)
-      .catch((reason: unknown) => {
-        setAuthError(reason instanceof Error ? reason.message : "Не вдалося перевірити акаунт.");
-      })
-      .finally(() => setAuthLoading(false));
-  }, []);
 
   useEffect(() => {
     document.title = isVacanciesPage
       ? "Вакансії для junior IT-фахівців — ArbeitFlow"
       : isContactsPage
         ? "Контакти — ArbeitFlow"
-        : isLoginPage
-          ? "Вхід — ArbeitFlow"
-          : isAdminPage
-            ? "Керування вакансіями — ArbeitFlow"
         : "ArbeitFlow — робота для junior IT-фахівців";
-  }, [isAdminPage, isContactsPage, isLoginPage, isVacanciesPage]);
-
-  function handleLogin(nextUser: AuthUser) {
-    setUser(nextUser);
-    window.location.assign(getRouteHref(nextUser.role === "admin" ? "/admin" : "/vacancies"));
-  }
-
-  async function handleLogout() {
-    setAuthError("");
-
-    try {
-      await logout();
-      setUser(null);
-      window.location.assign(getRouteHref("/"));
-    } catch (reason) {
-      setAuthError(reason instanceof Error ? reason.message : "Не вдалося вийти з акаунта.");
-    }
-  }
+  }, [isContactsPage, isVacanciesPage]);
 
   function showTestimonial(direction: number) {
     setActiveTestimonial(
@@ -166,49 +128,17 @@ function App() {
             >
               <span aria-hidden="true">{isDark ? "☼" : "☾"}</span>
             </button>
-            {user && (
-              <span className="account-role">
-                {user.role === "admin" ? "Адміністратор" : "Кандидат"}
-              </span>
-            )}
-            {user?.role === "admin" && (
-              <a className="button button-small admin-panel-link" href={getRouteHref("/admin")}>
-                Панель
-              </a>
-            )}
-            {user?.role !== "admin" && (
-              <a className="button button-small find-vacancy-button" href={getRouteHref("/vacancies")}>
-                Знайти вакансію
-              </a>
-            )}
-            {user ? (
-              <button
-                aria-label="Вийти з акаунта"
-                className="logout-button"
-                onClick={() => void handleLogout()}
-                type="button"
-              >
-                <span aria-hidden="true">↗</span>
-              </button>
-            ) : (
-              <a className="button button-small login-link" href={getRouteHref("/login")}>
-                Увійти
-              </a>
-            )}
+            <a className="button button-small find-vacancy-button" href={getRouteHref("/vacancies")}>
+              Знайти вакансію
+            </a>
           </div>
         </div>
       </header>
 
-      {authError && <p className="global-api-error" role="alert">{authError}</p>}
-
       {isVacanciesPage ? (
-        <VacanciesPage user={user} />
+        <VacanciesPage />
       ) : isContactsPage ? (
         <ContactsPage />
-      ) : isLoginPage ? (
-        <LoginPage onLogin={handleLogin} />
-      ) : isAdminPage ? (
-        <AdminPage authLoading={authLoading} user={user} />
       ) : <main id="main-content">
         <section aria-labelledby="hero-title" className="hero-section" id="home">
           <div aria-hidden="true" className="hero-glow" />

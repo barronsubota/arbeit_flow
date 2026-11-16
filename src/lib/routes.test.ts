@@ -5,7 +5,7 @@ describe("base-path routing", () => {
   it("normalizes routes when hosted under a repository path", () => {
     expect(getCurrentRoute("/arbeitflow/vacancies", "/arbeitflow/")).toBe("/vacancies");
     expect(getCurrentRoute("/arbeitflow/", "/arbeitflow/")).toBe("/");
-    expect(getRouteHref("/admin", "/arbeitflow/")).toBe("/arbeitflow/admin");
+    expect(getRouteHref("/vacancies", "/arbeitflow/")).toBe("/arbeitflow/vacancies");
     expect(getRouteHref("/", "/arbeitflow/")).toBe("/arbeitflow/");
   });
 

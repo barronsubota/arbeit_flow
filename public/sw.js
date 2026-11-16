@@ -1,9 +1,8 @@
-const CACHE_VERSION = "arbeitflow-v1";
+const CACHE_VERSION = "arbeitflow-v2";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const ASSET_CACHE = `${CACHE_VERSION}-assets`;
 const scopeUrl = self.registration.scope;
 const offlineUrl = new URL("index.html", scopeUrl).href;
-const apiPath = new URL("api/", scopeUrl).pathname;
 const assetsPath = new URL("assets/", scopeUrl).pathname;
 const iconsPath = new URL("icons/", scopeUrl).pathname;
 
@@ -59,8 +58,7 @@ self.addEventListener("fetch", (event) => {
 
   if (
     request.method !== "GET" ||
-    requestUrl.origin !== self.location.origin ||
-    requestUrl.pathname.startsWith(apiPath)
+    requestUrl.origin !== self.location.origin
   ) {
     return;
   }
