@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import VacanciesPage from "./VacanciesPage";
 
 const partners = [
   {
@@ -69,7 +70,14 @@ const testimonials = [
 function App() {
   const [isDark, setIsDark] = useState(true);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const isVacanciesPage = window.location.pathname.replace(/\/+$/, "") === "/vacancies";
   const testimonial = testimonials[activeTestimonial];
+
+  useEffect(() => {
+    document.title = isVacanciesPage
+      ? "Вакансії для junior IT-фахівців — ArbeitFlow"
+      : "ArbeitFlow — робота для junior IT-фахівців";
+  }, [isVacanciesPage]);
 
   function showTestimonial(direction: number) {
     setActiveTestimonial(
@@ -85,7 +93,7 @@ function App() {
 
       <header className="site-header">
         <div className="header-inner">
-          <a aria-label="ArbeitFlow — на головну" className="brand" href="#home">
+          <a aria-label="ArbeitFlow — на головну" className="brand" href="/">
             <span aria-hidden="true" className="brand-mark">
               A
             </span>
@@ -93,11 +101,13 @@ function App() {
           </a>
 
           <nav aria-label="Головна навігація" className="main-nav">
-            <a className="active" href="#home">
+            <a aria-current={!isVacanciesPage ? "page" : undefined} className={!isVacanciesPage ? "active" : undefined} href="/">
               Головна
             </a>
-            <a href="#partners">Вакансії</a>
-            <a href="#contact">Контакти</a>
+            <a aria-current={isVacanciesPage ? "page" : undefined} className={isVacanciesPage ? "active" : undefined} href="/vacancies">
+              Вакансії
+            </a>
+            <a href="/#contact">Контакти</a>
           </nav>
 
           <div className="header-actions">
@@ -109,14 +119,14 @@ function App() {
             >
               <span aria-hidden="true">{isDark ? "☼" : "☾"}</span>
             </button>
-            <a className="button button-small" href="#partners">
+            <a className="button button-small" href="/vacancies">
               Знайти вакансію
             </a>
           </div>
         </div>
       </header>
 
-      <main id="main-content">
+      {isVacanciesPage ? <VacanciesPage /> : <main id="main-content">
         <section aria-labelledby="hero-title" className="hero-section" id="home">
           <div aria-hidden="true" className="hero-glow" />
           <div className="hero-content">
@@ -131,7 +141,7 @@ function App() {
               Вакансії для junior IT-фахівців, чесні вимоги та команди, готові
               допомагати зростати.
             </p>
-            <a className="button hero-button" href="#partners">
+            <a className="button hero-button" href="/vacancies">
               Переглянути вакансії <span aria-hidden="true">→</span>
             </a>
             <p className="hero-note">Твій досвід — це більше, ніж рядок у резюме.</p>
@@ -165,7 +175,7 @@ function App() {
                 </span>
                 <h3>{partner.name}</h3>
                 <p>{partner.description}</p>
-                <a className="text-link" href="#contact">
+                <a className="text-link" href="/vacancies">
                   Переглянути вакансії <span aria-hidden="true">→</span>
                 </a>
               </article>
@@ -254,14 +264,14 @@ function App() {
             <p className="eyebrow">Наступний крок за тобою</p>
             <h2 id="contact-title">Готовий знайти свою першу IT-команду?</h2>
           </div>
-          <a className="button" href="#partners">
+          <a className="button" href="/vacancies">
             Переглянути команди <span aria-hidden="true">→</span>
           </a>
         </section>
-      </main>
+      </main>}
 
       <footer className="site-footer">
-        <a aria-label="ArbeitFlow — на головну" className="brand" href="#home">
+        <a aria-label="ArbeitFlow — на головну" className="brand" href="/">
           <span aria-hidden="true" className="brand-mark">
             A
           </span>
