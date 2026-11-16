@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import ContactsPage from "./ContactsPage";
-import VacanciesPage from "./VacanciesPage";
+import ContactsPage from "./pages/ContactsPage";
+import VacanciesPage from "./pages/VacanciesPage";
 
 const partners = [
   {
