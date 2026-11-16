@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import AdminPage from "./pages/AdminPage";
 import ContactsPage from "./pages/ContactsPage";
+import LoginPage from "./pages/LoginPage";
 import VacanciesPage from "./pages/VacanciesPage";
+import { getCurrentUser, logout, type AuthUser } from "./lib/api";
 
 const partners = [
   {
@@ -71,18 +74,54 @@ const testimonials = [
 function App() {
   const [isDark, setIsDark] = useState(true);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authError, setAuthError] = useState("");
   const currentPath = window.location.pathname.replace(/\/+$/, "");
   const isVacanciesPage = currentPath === "/vacancies";
   const isContactsPage = currentPath === "/contacts";
+  const isLoginPage = currentPath === "/login";
+  const isAdminPage = currentPath === "/admin";
+  const isHomePage = !isVacanciesPage && !isContactsPage && !isLoginPage && !isAdminPage;
   const testimonial = testimonials[activeTestimonial];
+
+  useEffect(() => {
+    getCurrentUser()
+      .then(setUser)
+      .catch((reason: unknown) => {
+        setAuthError(reason instanceof Error ? reason.message : "Не вдалося перевірити акаунт.");
+      })
+      .finally(() => setAuthLoading(false));
+  }, []);
 
   useEffect(() => {
     document.title = isVacanciesPage
       ? "Вакансії для junior IT-фахівців — ArbeitFlow"
       : isContactsPage
         ? "Контакти — ArbeitFlow"
+        : isLoginPage
+          ? "Вхід — ArbeitFlow"
+          : isAdminPage
+            ? "Керування вакансіями — ArbeitFlow"
         : "ArbeitFlow — робота для junior IT-фахівців";
-  }, [isContactsPage, isVacanciesPage]);
+  }, [isAdminPage, isContactsPage, isLoginPage, isVacanciesPage]);
+
+  function handleLogin(nextUser: AuthUser) {
+    setUser(nextUser);
+    window.location.assign(nextUser.role === "admin" ? "/admin" : "/vacancies");
+  }
+
+  async function handleLogout() {
+    setAuthError("");
+
+    try {
+      await logout();
+      setUser(null);
+      window.location.assign("/");
+    } catch (reason) {
+      setAuthError(reason instanceof Error ? reason.message : "Не вдалося вийти з акаунта.");
+    }
+  }
 
   function showTestimonial(direction: number) {
     setActiveTestimonial(
@@ -106,7 +145,7 @@ function App() {
           </a>
 
           <nav aria-label="Головна навігація" className="main-nav">
-            <a aria-current={!isVacanciesPage && !isContactsPage ? "page" : undefined} className={!isVacanciesPage && !isContactsPage ? "active" : undefined} href="/">
+            <a aria-current={isHomePage ? "page" : undefined} className={isHomePage ? "active" : undefined} href="/">
               Головна
             </a>
             <a aria-current={isVacanciesPage ? "page" : undefined} className={isVacanciesPage ? "active" : undefined} href="/vacancies">
@@ -126,14 +165,50 @@ function App() {
             >
               <span aria-hidden="true">{isDark ? "☼" : "☾"}</span>
             </button>
-            <a className="button button-small" href="/vacancies">
-              Знайти вакансію
-            </a>
+            {user && (
+              <span className="account-role">
+                {user.role === "admin" ? "Адміністратор" : "Кандидат"}
+              </span>
+            )}
+            {user?.role === "admin" && (
+              <a className="button button-small admin-panel-link" href="/admin">
+                Панель
+              </a>
+            )}
+            {user?.role !== "admin" && (
+              <a className="button button-small find-vacancy-button" href="/vacancies">
+                Знайти вакансію
+              </a>
+            )}
+            {user ? (
+              <button
+                aria-label="Вийти з акаунта"
+                className="logout-button"
+                onClick={() => void handleLogout()}
+                type="button"
+              >
+                <span aria-hidden="true">↗</span>
+              </button>
+            ) : (
+              <a className="button button-small login-link" href="/login">
+                Увійти
+              </a>
+            )}
           </div>
         </div>
       </header>
 
-      {isVacanciesPage ? <VacanciesPage /> : isContactsPage ? <ContactsPage /> : <main id="main-content">
+      {authError && <p className="global-api-error" role="alert">{authError}</p>}
+
+      {isVacanciesPage ? (
+        <VacanciesPage user={user} />
+      ) : isContactsPage ? (
+        <ContactsPage />
+      ) : isLoginPage ? (
+        <LoginPage onLogin={handleLogin} />
+      ) : isAdminPage ? (
+        <AdminPage authLoading={authLoading} user={user} />
+      ) : <main id="main-content">
         <section aria-labelledby="hero-title" className="hero-section" id="home">
           <div aria-hidden="true" className="hero-glow" />
           <div className="hero-content">

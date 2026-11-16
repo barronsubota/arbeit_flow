@@ -1,11 +1,9 @@
 # ArbeitFlow
 
-Landing page for a junior IT job platform built with React, TypeScript, and Vite.
+Junior IT job platform built with React, TypeScript, Vite, Express, and SQLite.
 
-The home page is available at `/`, browse and filter demo junior roles at `/vacancies`,
-and contact the platform at `/contacts`.
-Vacancies can be searched by position, company, technology, or location, and saved
-to favorites in the browser.
+The home page is available at `/`, browse and filter junior roles at `/vacancies`,
+contact the platform at `/contacts`, sign in at `/login`, and manage listings at `/admin`.
 
 ## Run locally
 
@@ -14,8 +12,22 @@ npm install
 npm run dev
 ```
 
+The first development start creates `credentials.local.txt` with one admin and one
+user account. Keep this local file private; it is excluded from Git. The development
+client runs at `http://127.0.0.1:4173` and the API at `http://127.0.0.1:3001`.
+
 ## Build
 
 ```sh
 npm run build
 ```
+
+## API
+
+- `GET /api/vacancies` and `GET /api/vacancies/:id` are public.
+- `POST /api/vacancies` and `PUT`/`DELETE /api/vacancies/:id` require the admin account.
+- `POST /api/auth/login` and `POST /api/auth/logout` manage the HTTP-only session.
+- `GET /api/favorites`, `POST /api/favorites/:vacancyId`, and
+  `DELETE /api/favorites/:vacancyId` require a signed-in account.
+
+The database is stored locally in `.data/arbeitflow.sqlite`.

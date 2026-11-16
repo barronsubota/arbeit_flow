@@ -1147,6 +1147,243 @@ h1 span {
   clip-path: inset(50%);
 }
 
+.account-role {
+  color: var(--text-muted);
+  font-size: 0.73rem;
+  white-space: nowrap;
+}
+
+.logout-button {
+  display: grid;
+  width: 2.45rem;
+  height: 2.45rem;
+  flex-shrink: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text);
+  background: var(--surface-card);
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.logout-button:hover {
+  color: var(--primary);
+  background: var(--surface-hover);
+}
+
+.global-api-error,
+.api-error {
+  width: min(100% - 3rem, 1180px);
+  margin: 1rem auto;
+  padding: 0.8rem 1rem;
+  border-radius: 0.75rem;
+  color: #ffb4ab;
+  background: color-mix(in srgb, #ba1a1a 20%, var(--surface-raised));
+  font-size: 0.82rem;
+}
+
+.api-error a {
+  margin-left: 0.3rem;
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.auth-page {
+  display: grid;
+  min-height: min(720px, calc(100vh - 180px));
+  place-items: center;
+  padding: 3rem 1.5rem;
+}
+
+.auth-panel {
+  width: min(100%, 480px);
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+  border-radius: 1.25rem;
+  background: var(--surface-raised);
+}
+
+.auth-panel h1 {
+  margin-bottom: 0.75rem;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+}
+
+.auth-intro,
+.auth-footnote {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+
+.auth-intro {
+  margin-bottom: 1.4rem;
+}
+
+.auth-form,
+.admin-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth-submit,
+.admin-submit {
+  justify-self: start;
+  cursor: pointer;
+}
+
+.auth-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.auth-footnote {
+  margin: 1.1rem 0 0;
+  font-size: 0.75rem;
+}
+
+.auth-footnote a {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.admin-page {
+  width: min(100% - 3rem, 1180px);
+  margin: 0 auto;
+  padding: 4rem 0 5rem;
+}
+
+.admin-heading {
+  margin-bottom: 2rem;
+}
+
+.admin-heading h1 {
+  margin-bottom: 0.75rem;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+}
+
+.admin-heading > p:last-child {
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.admin-editor,
+.admin-list {
+  margin-top: 1.5rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: 1.2rem;
+  background: var(--surface-raised);
+}
+
+.admin-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-section-heading .eyebrow {
+  margin-bottom: 0.5rem;
+}
+
+.admin-section-heading h2 {
+  margin: 0;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+}
+
+.admin-count {
+  display: inline-grid;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  margin-left: 0.3rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--primary);
+  background: var(--surface-card);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.72rem;
+  vertical-align: middle;
+}
+
+.secondary-button,
+.danger-button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  border: 0;
+  border-radius: 999px;
+  color: var(--text);
+  background: var(--surface-card);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.secondary-button:hover {
+  background: var(--surface-hover);
+}
+
+.danger-button {
+  color: #ffb4ab;
+  background: color-mix(in srgb, #ba1a1a 18%, var(--surface-card));
+}
+
+.danger-button:hover {
+  background: color-mix(in srgb, #ba1a1a 30%, var(--surface-card));
+}
+
+.admin-vacancy-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.admin-vacancy-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.8rem;
+  border-radius: 0.85rem;
+  background: var(--surface-card);
+}
+
+.admin-vacancy-row .vacancy-company-mark {
+  width: 2.65rem;
+  height: 2.65rem;
+  flex-shrink: 0;
+}
+
+.admin-vacancy-info {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 0.25rem;
+}
+
+.admin-vacancy-info strong {
+  font-size: 0.85rem;
+}
+
+.admin-vacancy-info > span {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.73rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-row-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.4rem;
+}
+
+.admin-empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
 .contacts-hero,
 .contacts-content {
   width: min(100% - 3rem, 1180px);
@@ -1462,7 +1699,18 @@ h1 span {
   }
 
   .header-actions {
+    gap: 0.4rem;
     margin-left: auto;
+  }
+
+  .account-role,
+  .find-vacancy-button {
+    display: none;
+  }
+
+  .logout-button {
+    width: 2.4rem;
+    height: 2.4rem;
   }
 
   .main-nav {
@@ -1486,6 +1734,11 @@ h1 span {
   .contacts-hero,
   .contacts-content {
     width: min(100% - 2rem, 1180px);
+  }
+
+  .admin-page {
+    width: min(100% - 2rem, 1180px);
+    padding: 3rem 0;
   }
 
   .contacts-content {
@@ -1682,6 +1935,20 @@ h1 span {
     bottom: 3.2rem;
     width: calc(100% - 2rem);
   }
+
+  .admin-vacancy-row {
+    flex-wrap: wrap;
+  }
+
+  .admin-vacancy-info {
+    width: calc(100% - 4rem);
+    flex: none;
+  }
+
+  .admin-row-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 @media (max-width: 420px) {
@@ -1698,6 +1965,10 @@ h1 span {
   .vacancy-results,
   .contacts-hero,
   .contacts-content {
+    width: min(100% - 1.5rem, 1180px);
+  }
+
+  .admin-page {
     width: min(100% - 1.5rem, 1180px);
   }
 
