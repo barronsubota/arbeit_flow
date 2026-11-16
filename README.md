@@ -22,6 +22,15 @@ client runs at `http://127.0.0.1:4173` and the API at `http://127.0.0.1:3001`.
 npm run build
 ```
 
+## Tests
+
+```sh
+npm test
+```
+
+The test suite covers contact and sign-in forms, vacancy search and favorites,
+administrator vacancy management, and API authentication, authorization, and CRUD.
+
 ## API
 
 - `GET /api/vacancies` and `GET /api/vacancies/:id` are public.
